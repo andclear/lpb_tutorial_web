@@ -336,15 +336,6 @@ export const tabs = [
             "category": "图文教程",
             "colorTheme": "blue",
             "icon": "Rocket"
-          },
-          {
-            "id": "t1753000796332",
-            "title": "【还没写完】LMArena竞技场反代教程",
-            "linkUrl": "",
-            "remark": "基本上可以用绝大多数超强模型。必须使用电脑，目前教程基于Windows，没有提供Mac的教程。电脑必须常开，必须内网穿透后才能用于云酒馆。",
-            "category": "还没写完",
-            "colorTheme": "blue",
-            "icon": "Rocket"
           }
         ]
       },
