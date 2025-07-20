@@ -171,14 +171,14 @@ export default function Home() {
               />
             </div>
             <h2 className="gradient-title text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
-              老婆宝的酒馆教程发布站
+              老婆宝的教程发布站
             </h2>
-            <p className="text-slate-300 max-w-4xl mx-auto leading-relaxed text-base sm:text-lg md:text-xl mb-8 sm:mb-10 px-4 font-light">
-              完全开源、免费的SillyTavern教程发布站，由老婆宝撰写。
+            <p className="text-slate-300 max-w-4xl mx-auto leading-loose text-base sm:text-lg md:text-xl mb-8 sm:mb-10 px-4 font-light">
+              完全<span style={{ color: '#A5F3CB', fontWeight: '450' }}>开源、免费</span>的教程发布站，由老婆宝撰写。
               <br className="hidden sm:block" />
-              请不要以任何形式将本站内容用于商业用途，包括但不限于：推广、商业引流等。
+              <span style={{ marginTop: '8px', display: 'inline-block', fontWeight: '450' }}>不允许将本站内容用于<span style={{ color: '#FF9B9B' }}>任何商业用途</span>。</span>
               <br className="hidden sm:block" />
-              感兴趣可加Q群交流，没有使用QQ习惯的不要加，不活跃会踢。
+              <span style={{ color: '#93EEB7', marginTop: '8px', display: 'inline-block' }}>可加Q群交流，无使用QQ习惯的不要加，不活跃会踢。</span>
             </p>
             
             {/* 操作按钮 */}
