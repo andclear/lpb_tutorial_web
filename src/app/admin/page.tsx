@@ -445,12 +445,12 @@ export default function AdminPage() {
   const loadConfig = async () => {
     try {
       // 动态导入配置文件
-      const configModule = await import('@/site.config.js')
+      const configModule = await import('../../site.config.js')
       const loadedConfig: ConfigData = {
         siteInfo: configModule.siteInfo,
         donation: configModule.donation,
         socialMedia: configModule.socialMedia,
-        tabs: configModule.tabs
+        tabs: configModule.tabs || []
       }
       setConfig(loadedConfig)
       
@@ -466,6 +466,13 @@ export default function AdminPage() {
       setCollapsedTutorials(allTutorialIds)
     } catch (error) {
       console.error('加载配置文件失败:', error)
+      // 设置一个默认配置以防止页面卡住
+      setConfig({
+        siteInfo: { title: '', footerText: '' },
+        donation: { enabled: false, title: '', text: '', paymentOptions: [] },
+        socialMedia: {},
+        tabs: []
+      })
     }
   }
 

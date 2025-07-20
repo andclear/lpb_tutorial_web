@@ -204,9 +204,6 @@ export class MemoryCache {
 // 创建全局缓存实例
 export const globalCache = new MemoryCache(1000, 5 * 60 * 1000) // 1000项，5分钟TTL
 
-// 催更数据专用缓存
-export const urgeCache = new MemoryCache(500, 2 * 60 * 1000) // 500项，2分钟TTL
-
 // 缓存装饰器
 export function cached(
   cache: MemoryCache = globalCache,
@@ -245,14 +242,6 @@ export function cached(
 
 // 缓存工具函数
 export const cacheUtils = {
-  // 生成催更缓存键
-  urgeKey: (tutorialId: string, type: 'count' | 'limit' | 'stats') => 
-    `urge_${type}_${tutorialId}`,
-  
-  // 生成 IP 限制缓存键
-  ipLimitKey: (tutorialId: string, ip: string) => 
-    `ip_limit_${tutorialId}_${ip}`,
-  
   // 批量删除匹配模式的缓存
   deletePattern: (cache: MemoryCache, pattern: string) => {
     const keys = cache.keys().filter(key => key.includes(pattern))

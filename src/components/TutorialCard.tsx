@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, memo } from 'react'
+import { useState, memo, useMemo, useCallback } from 'react'
 import { Info, ExternalLink, BookOpen, Sparkles, GraduationCap, Brain, Lightbulb, Target, Award, BookMarked, Library, Code, Terminal, Cpu, Database, Globe, Smartphone, Monitor, Server, Settings, Wrench, Hammer, Scissors, Paintbrush, Palette, Compass, Calculator, Video, Image, Music, Camera, Film, Mic, Headphones, Radio, Gamepad2, Joystick, Dice1, Puzzle, Trophy, Star, Heart, Briefcase, FileText, PieChart, BarChart, TrendingUp, DollarSign, CreditCard, Building, Pencil, Users, Clock, Calendar, Bookmark, GitBranch, Github, Cloud, Laptop, HardDrive, Wifi, Zap, Bug, Search, Filter, Download, Upload, Copy, Share, Link as LinkIcon, Lock, Play, Pause, Volume2, MessageCircle, Gift, Coffee, Mail, Phone, User, MapPin, ShoppingCart, Bot, Rocket, Activity, Home, Car, Plane, Train, Bike, Apple, Utensils, ShoppingBag, Shirt, Sun, Moon, Tablet } from 'lucide-react'
 
 // 本地卡片颜色配置
@@ -99,37 +99,50 @@ const iconMap = {
 const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps) {
   const [showTooltip, setShowTooltip] = useState(false)
 
-  // 获取颜色配置
-  const getColorConfig = (colorTheme?: string) => {
-    const theme = colorTheme && colorTheme.trim() ? colorTheme : 'blue'
+  // 使用 useMemo 缓存颜色配置计算
+  const colorConfig = useMemo(() => {
+    const theme = tutorial.colorTheme && tutorial.colorTheme.trim() ? tutorial.colorTheme : 'blue'
     return cardColors[theme as keyof typeof cardColors] || cardColors.blue
-  }
+  }, [tutorial.colorTheme])
 
-  // 获取图标组件
-  const getIconComponent = (iconName?: string) => {
-    const icon = iconName && iconName.trim() ? iconName : 'BookOpen'
+  // 使用 useMemo 缓存图标组件
+  const IconComponent = useMemo(() => {
+    const icon = tutorial.icon && tutorial.icon.trim() ? tutorial.icon : 'BookOpen'
     return iconMap[icon as keyof typeof iconMap] || BookOpen
-  }
+  }, [tutorial.icon])
 
-  const colorConfig = getColorConfig(tutorial.colorTheme)
-  const IconComponent = getIconComponent(tutorial.icon)
-
-  // 生成内联样式以确保颜色正确显示
-  const gradientStyle = {
+  // 使用 useMemo 缓存样式对象，避免每次渲染重新创建
+  const gradientStyle = useMemo(() => ({
     background: `linear-gradient(135deg, ${getGradientColors(colorConfig.gradient)})`
-  }
+  }), [colorConfig.gradient])
 
-  const textGradientStyle = {
+  const textGradientStyle = useMemo(() => ({
     background: `linear-gradient(135deg, ${getTextGradientColors(colorConfig.text)})`,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text'
-  }
+  }), [colorConfig.text])
+
+  const borderColor = useMemo(() => getBorderColor(colorConfig.border), [colorConfig.border])
+
+  // 使用 useCallback 优化事件处理函数
+  const handleTooltipToggle = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setShowTooltip(!showTooltip)
+  }, [showTooltip])
+
+  const handleMouseEnter = useCallback(() => {
+    setShowTooltip(true)
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    setShowTooltip(false)
+  }, [])
 
   return (
     <div className="relative group">
       <div className={`tutorial-card bg-slate-800/60 backdrop-blur-lg rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-200 hover:transform hover:scale-[1.01] hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/30`} 
-           style={{ borderColor: getBorderColor(colorConfig.border) }}>
+           style={{ borderColor }}>
         
         {/* 可点击的主要内容区域 */}
         <a
@@ -139,34 +152,28 @@ const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps)
           className="block cursor-pointer"
         >
           {/* 装饰性头部区域 */}
-          <div className="relative h-20 sm:h-24 overflow-hidden" style={gradientStyle}>
-            {/* 简化的装饰性图案 */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-white/10"></div>
-              <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-white/5"></div>
-              <div className="absolute bottom-2 left-6 w-4 h-4 rounded-full bg-white/10"></div>
-              <div className="absolute bottom-4 right-2 w-10 h-10 rounded-full bg-white/5"></div>
-            </div>
-            
-            {/* 主要图标 */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20 group-hover:scale-105 transition-transform duration-200">
-                  <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-white/80" />
-                </div>
-                {/* 简化的装饰 */}
-                <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <Sparkles className="w-4 h-4 text-yellow-300" />
-                </div>
-              </div>
+          <div className="h-20 sm:h-24 lg:h-28 relative overflow-hidden"
+               style={gradientStyle}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+            <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-white/5"></div>
+            <div className="absolute -bottom-2 -left-2 w-12 h-12 rounded-full bg-white/5"></div>
+          </div>
+
+          {/* 主要图标 */}
+          <div className="px-4 sm:px-5 lg:px-6 -mt-8 sm:-mt-10 lg:-mt-12 relative z-10">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl backdrop-blur-sm border border-white/20"
+                 style={gradientStyle}>
+              {IconComponent && <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />}
             </div>
             
             {/* 外部链接图标 */}
-            <div className="absolute top-2 sm:top-3 right-2 sm:right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+            {tutorial.linkUrl && (
+              <div className="absolute top-2 right-0">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-700/80 backdrop-blur-sm flex items-center justify-center border border-slate-600/50">
+                  <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-300" />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 标题区域 - 固定高度解决不一致问题 */}
@@ -187,10 +194,7 @@ const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps)
             <div className="flex items-center">
               {tutorial.category && tutorial.category.trim() && (
                 <span className="backdrop-blur-sm text-white text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium shadow-lg"
-                      style={{ 
-                        background: `linear-gradient(135deg, ${getGradientColors(colorConfig.gradient)})`,
-                        borderColor: getBorderColor(colorConfig.border)
-                      }}>
+                      style={gradientStyle}>
                   {tutorial.category}
                 </span>
               )}
@@ -199,16 +203,13 @@ const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps)
             {/* 详情按钮 */}
             <div 
               className="relative"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <button
                 className="px-3 py-1.5 text-xs font-medium bg-slate-700/50 backdrop-blur-sm rounded-lg flex items-center gap-1.5 transition-all duration-200 hover:scale-105 hover:shadow-lg text-slate-300 hover:text-white"
-                style={{ borderColor: getBorderColor(colorConfig.border) }}
-                onClick={(e) => {
-                  e.preventDefault()
-                  setShowTooltip(!showTooltip)
-                }}
+                style={{ borderColor }}
+                onClick={handleTooltipToggle}
               >
                 <Info className="w-3 h-3" />
                 <span>详情&gt;&gt;</span>

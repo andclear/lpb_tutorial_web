@@ -2,7 +2,7 @@
 
 // 1. 全局站点信息
 export const siteInfo = {
-  "title": "老婆宝的教程导航站",
+  "title": "老婆宝的教程发布站",
   "footerText": "本站点由老婆宝搭建\n小红书账号：老婆宝  |  小红书号：laopobao"
 };
 
@@ -35,7 +35,7 @@ export const socialMedia = {
     "title": "小红书"
   },
   "douyin": {
-    "enabled": false,
+    "enabled": true,
     "url": "https://www.douyin.com",
     "title": "抖音"
   },
@@ -269,6 +269,15 @@ export const tabs = [
             "icon": "Monitor"
           },
           {
+            "id": "t103",
+            "title": "Mac电脑搭建酒馆教程",
+            "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/ClTGwTtpWiqOzKkfidCc6CnvnHh?from=from_copylink",
+            "remark": "超级详细的Mac酒馆搭建教程，包含搭建时所需的安装文件下载，更有进阶教程，可以让你在局域网、外网环境下通过其他设备访问电脑上的酒馆。（电脑不能关机、断网）",
+            "category": "图文教程",
+            "colorTheme": "indigo",
+            "icon": "Laptop"
+          },
+          {
             "id": "t1752955473149",
             "title": "VPS云酒馆搭建教程",
             "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/UVKxw8VuziKBMXkYOapcSwznnIb?from=from_copylink",
@@ -285,15 +294,6 @@ export const tabs = [
             "category": "图文教程",
             "colorTheme": "teal",
             "icon": "Globe"
-          },
-          {
-            "id": "t103",
-            "title": "Mac电脑搭建酒馆教程",
-            "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/ClTGwTtpWiqOzKkfidCc6CnvnHh?from=from_copylink",
-            "remark": "超级详细的Mac酒馆搭建教程，包含搭建时所需的安装文件下载，更有进阶教程，可以让你在局域网、外网环境下通过其他设备访问电脑上的酒馆。（电脑不能关机、断网）",
-            "category": "图文教程",
-            "colorTheme": "indigo",
-            "icon": "Laptop"
           }
         ]
       },
@@ -360,6 +360,15 @@ export const tabs = [
             "category": "还没写完",
             "colorTheme": "orange",
             "icon": "Bot"
+          },
+          {
+            "id": "t1753034370097",
+            "title": "测试版",
+            "linkUrl": "",
+            "remark": "这是一个测试文件",
+            "category": "测试内容",
+            "colorTheme": "blue",
+            "icon": "Paintbrush"
           }
         ]
       }

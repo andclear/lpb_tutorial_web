@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Clock, Heart, BookOpen } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import UrgeButton from '@/components/UrgeButton'
+
 
 // 本地定义颜色配置
 const cardColors = {
@@ -172,20 +172,14 @@ export default function WaitingPage() {
             )}
           </div>
 
-          {/* 返回按钮和催更按钮 */}
+          {/* 返回按钮 */}
           <div className="text-center">
-            {/* 按钮区域 */}
-            <div className="flex gap-4 justify-center items-center">
-              <button
-                onClick={handleGoBack}
-                className={`px-8 py-4 bg-gradient-to-r ${colorConfig.gradient} text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
-              >
-                返回教程发布页
-              </button>
-              
-              {/* 催更按钮 */}
-              <UrgeButton tutorialId={tutorial.id} colorTheme={tutorial.color} />
-            </div>
+            <button
+              onClick={handleGoBack}
+              className={`px-8 py-4 bg-gradient-to-r ${colorConfig.gradient} text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
+            >
+              返回教程发布页
+            </button>
           </div>
         </div>
       </div>

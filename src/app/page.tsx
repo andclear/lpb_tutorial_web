@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Heart, Bookmark, ExternalLink, Users } from 'lucide-react'
 import { siteInfo as defaultSiteInfo, donation as defaultDonation, tabs as defaultTabs, socialMedia as defaultSocialMedia } from '@/site.config'
 import TutorialCard from '../components/TutorialCard'
@@ -49,8 +49,8 @@ export default function Home() {
     return activeTab.groups.reduce((total, group) => total + group.tutorials.length, 0)
   }, [activeTab])
 
-  // 创建爱心飘出动画
-  const createHeartAnimation = (event: React.MouseEvent) => {
+  // 创建爱心飘出动画 - 使用 useCallback 优化
+  const createHeartAnimation = useCallback((event: React.MouseEvent) => {
     const rect = event.currentTarget.getBoundingClientRect()
     const heartEmojis = ['❤️', '💖', '💕', '💗', '💝', '💘', '🧡', '💛', '💚', '💙', '💜']
     
@@ -76,7 +76,38 @@ export default function Home() {
         }, 4000)
       }, i * 150 + Math.random() * 200) // 每个爱心间隔150-350ms出现
     }
-  }
+  }, [])
+
+  // 优化事件处理函数
+  const handleDonationClick = useCallback((e: React.MouseEvent) => {
+    createHeartAnimation(e)
+    setShowDonationModal(true)
+  }, [createHeartAnimation])
+
+  const handleBookmarkClick = useCallback(() => {
+    setShowBookmarkModal(true)
+  }, [])
+
+  const handleTabChange = useCallback((tabId: string) => {
+    setActiveTabId(tabId)
+    setActiveGroupId('all') // 切换标签页时重置分组
+  }, [])
+
+  const handleGroupChange = useCallback((groupId: string) => {
+    setActiveGroupId(groupId)
+  }, [])
+
+  // 清除临时配置 - 使用 useCallback 优化
+  const clearTempConfig = useCallback(() => {
+    localStorage.removeItem('tempSiteConfig')
+    setSiteInfo(defaultSiteInfo)
+    setDonation(defaultDonation)
+    setTabs(defaultTabs)
+    setSocialMedia(defaultSocialMedia)
+    setActiveTabId(defaultTabs[0]?.id || '')
+    setActiveGroupId('all')
+    setIsPreviewMode(false)
+  }, [])
 
   // 加载配置（优先使用临时配置）- 优化为同步加载
   useEffect(() => {
@@ -107,18 +138,6 @@ export default function Home() {
       setActiveGroupId('all')
     }
   }, []) // 保持空依赖数组，确保只执行一次
-
-  // 清除临时配置
-  const clearTempConfig = () => {
-    localStorage.removeItem('tempSiteConfig')
-    setSiteInfo(defaultSiteInfo)
-    setDonation(defaultDonation)
-    setTabs(defaultTabs)
-    setSocialMedia(defaultSocialMedia)
-    setActiveTabId(defaultTabs[0]?.id || '')
-    setActiveGroupId('all')
-    setIsPreviewMode(false)
-  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -165,7 +184,7 @@ export default function Home() {
             {/* 操作按钮 */}
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-6 sm:mb-8 px-4">
               <button
-                onClick={() => setShowBookmarkModal(true)}
+                onClick={handleBookmarkClick}
                 className="spotlight-btn flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-white text-sm sm:text-base font-medium border border-slate-600 hover:border-slate-500 hover:bg-slate-800/30"
               >
                 <Bookmark className="w-4 h-4" />
@@ -184,10 +203,7 @@ export default function Home() {
               
               {donation.enabled && (
                 <button
-                  onClick={(e) => {
-                    createHeartAnimation(e)
-                    setShowDonationModal(true)
-                  }}
+                  onClick={handleDonationClick}
                   className="spotlight-btn bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-white text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   <Heart className="w-4 h-4" />
@@ -208,7 +224,7 @@ export default function Home() {
                 {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTabId(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`spotlight-btn px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 border text-sm sm:text-base ${
                     activeTabId === tab.id
                       ? 'btn-gradient text-white border-blue-500'
@@ -235,7 +251,7 @@ export default function Home() {
                   <div className="flex items-center gap-1 text-sm text-slate-500">
                     <span className="text-slate-600">筛选:</span>
                     <button
-                      onClick={() => setActiveGroupId('all')}
+                      onClick={() => handleGroupChange('all')}
                       className={`transition-colors duration-200 hover:text-slate-300 ${
                         activeGroupId === 'all'
                           ? 'text-slate-300 font-medium'
@@ -248,7 +264,7 @@ export default function Home() {
                       <span key={group.id} className="flex items-center gap-1">
                         <span className="text-slate-600">·</span>
                         <button
-                          onClick={() => setActiveGroupId(group.id)}
+                          onClick={() => handleGroupChange(group.id)}
                           className={`transition-colors duration-200 hover:text-slate-300 ${
                             activeGroupId === group.id
                               ? 'text-slate-300 font-medium'
