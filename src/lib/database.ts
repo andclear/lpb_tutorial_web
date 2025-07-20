@@ -23,10 +23,6 @@ function getPool(): mysql.Pool {
       password: dbUrl.password,
       database: dbUrl.pathname.slice(1), // 移除开头的 '/'
       connectionLimit: 10,
-      acquireTimeout: 60000,
-      reconnect: true,
-      idleTimeout: 300000,
-      queueLimit: 0,
       ssl: {
         rejectUnauthorized: false // TiDB Cloud 需要 SSL 但可能使用自签名证书
       }

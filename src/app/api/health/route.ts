@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     
   } catch (error) {
     console.error('Health check failed:', error)
-    return handleApiError(error, request)
+    return handleApiError(error)
   }
 }
 
@@ -124,6 +124,6 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error('Failed to reset monitoring data:', error)
-    return handleApiError(error, request)
+    return handleApiError(error)
   }
 }
