@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createSuccessResponse, createErrorResponse, handleApiError } from '@/lib/api'
 import { performanceMonitor, getHealthStatus, formatBytes } from '@/lib/monitoring'
-import { testDatabaseConnection } from '@/lib/database'
+import { testDatabaseConnection, initializeTables } from '@/lib/database'
 
 // GET /api/health - 健康检查
 export async function GET(request: NextRequest) {
@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     try {
       await testDatabaseConnection()
       dbStatus = 'connected'
+      
+      // 初始化数据库表（如果不存在）
+      await initializeTables()
     } catch (error) {
       dbStatus = 'disconnected'
       dbError = error instanceof Error ? error.message : 'Database connection failed'

@@ -100,9 +100,34 @@ export function validateTutorialId(tutorialId: string): boolean {
 }
 
 export function validateIPAddress(ip: string): boolean {
+  // 允许空值或unknown（本地开发环境）
+  if (!ip || ip === 'unknown' || ip === 'localhost' || ip === '::1') {
+    return true
+  }
+  
+  // IPv4 验证
   const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
-  const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/
-  return ipv4Regex.test(ip) || ipv6Regex.test(ip) || ip === 'unknown'
+  if (ipv4Regex.test(ip)) {
+    // 进一步验证每个数字段是否在0-255范围内
+    const parts = ip.split('.')
+    return parts.every(part => {
+      const num = parseInt(part, 10)
+      return num >= 0 && num <= 255
+    })
+  }
+  
+  // IPv6 验证（简化版）
+  const ipv6Regex = /^([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}$/
+  if (ipv6Regex.test(ip)) {
+    return true
+  }
+  
+  // 本地环境的其他可能值
+  if (ip.includes('127.0.0.1') || ip.includes('localhost')) {
+    return true
+  }
+  
+  return false
 }
 
 // 时间工具

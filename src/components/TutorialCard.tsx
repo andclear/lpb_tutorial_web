@@ -216,27 +216,58 @@ export default function TutorialCard({ tutorial }: TutorialCardProps) {
 
               {/* 优化的详情提示框 */}
               {showTooltip && (
-                <div className="absolute bottom-full mb-2 right-0 w-64 max-w-[calc(100vw-3rem)] bg-slate-800/95 backdrop-blur-xl border border-slate-600/80 rounded-lg p-3 shadow-2xl z-50 transform transition-all duration-300 animate-in fade-in-0 slide-in-from-bottom-2">
-                  <div className="flex items-start gap-2 mb-2">
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0"
-                         style={gradientStyle}>
-                      <Info className="w-3 h-3 text-white" />
+                <div className="absolute bottom-full mb-2 right-0 w-56 max-w-[calc(100vw-2rem)] bg-slate-800/95 backdrop-blur-xl border border-slate-600/80 rounded-lg p-3 shadow-2xl z-50 transform transition-all duration-300 animate-in fade-in-0 slide-in-from-bottom-2">
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-amber-400 mb-2">教程详情</h4>
+                    <div className="text-xs leading-relaxed text-slate-200">
+                      {tutorial.remark && tutorial.remark.trim() ? (
+                        <div className="space-y-1">
+                          {/* 如果备注较短，直接显示 */}
+                          {tutorial.remark.length <= 100 ? (
+                            <p>{tutorial.remark}</p>
+                          ) : (
+                            /* 如果备注较长，自动滚动显示 */
+                            <div className="max-h-24 overflow-hidden relative">
+                              <div 
+                                className="animate-marquee"
+                                style={{
+                                  animation: 'marqueeWithDelay 12s linear infinite'
+                                }}
+                              >
+                                <style jsx>{`
+                                  @keyframes marqueeWithDelay {
+                                    0% {
+                                      transform: translateY(0);
+                                    }
+                                    17% {
+                                      transform: translateY(0);
+                                    }
+                                    100% {
+                                      transform: translateY(-50%);
+                                    }
+                                  }
+                                  .animate-marquee {
+                                    white-space: pre-line;
+                                    line-height: 1.4;
+                                  }
+                                `}</style>
+                                <div className="pb-24">
+                                  {tutorial.remark}
+                                </div>
+                                <div className="pb-24">
+                                  {tutorial.remark}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-slate-400 italic">暂无详细描述</p>
+                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-semibold text-white mb-1">教程详情</h4>
-                      <div className="text-xs leading-relaxed text-slate-200 max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
-                        {tutorial.remark && tutorial.remark.length > 80 
-                          ? tutorial.remark
-                          : tutorial.remark || '暂无详细描述'}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-600/60">
-                    <span className="text-xs text-slate-400">点击访问</span>
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
                   </div>
                   {/* 箭头指示器 */}
-                  <div className="absolute top-full right-3 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-800/95"></div>
+                  <div className="absolute top-full right-4 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-800/95"></div>
                 </div>
               )}
             </div>
