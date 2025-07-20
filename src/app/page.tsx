@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Heart, Bookmark, ExternalLink } from 'lucide-react'
+import { Heart, Bookmark, ExternalLink, Users } from 'lucide-react'
 import { siteInfo as defaultSiteInfo, donation as defaultDonation, tabs as defaultTabs, socialMedia as defaultSocialMedia } from '@/site.config'
 import TutorialCard from '../components/TutorialCard'
 import DonationModal from '../components/DonationModal'
@@ -9,17 +9,45 @@ import BookmarkModal from '../components/BookmarkModal'
 import Image from 'next/image'
 
 export default function Home() {
-  // 状态管理
+  // 状态管理 - 优化初始状态，确保立即渲染
   const [siteInfo, setSiteInfo] = useState(defaultSiteInfo)
   const [donation, setDonation] = useState(defaultDonation)
   const [tabs, setTabs] = useState(defaultTabs)
   const [socialMedia, setSocialMedia] = useState(defaultSocialMedia)
-  const [activeTabId, setActiveTabId] = useState('')
-  const [activeGroupId, setActiveGroupId] = useState('all') // 新增分组筛选状态
+  const [activeTabId, setActiveTabId] = useState(defaultTabs[0]?.id || '') // 立即设置默认标签页
+  const [activeGroupId, setActiveGroupId] = useState('all') // 默认显示所有分组
   const [showDonationModal, setShowDonationModal] = useState(false)
   const [showBookmarkModal, setShowBookmarkModal] = useState(false)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [hearts, setHearts] = useState<Array<{id: number, x: number, y: number, delay: number, size: number, emoji: string}>>([])
+
+  // 预计算所有需要的数据，确保立即可用
+  const enabledSocialMedia = useMemo(() => 
+    Object.entries(socialMedia)
+      .filter(([_, config]) => config.enabled)
+      .map(([key, config]) => ({
+        key,
+        ...config
+      })), [socialMedia])
+
+  const activeTab = useMemo(() => 
+    tabs.find(tab => tab.id === activeTabId) || tabs[0], [tabs, activeTabId]) // 确保总是有活动标签页
+
+  const availableGroups = useMemo(() => {
+    if (!activeTab) return []
+    return activeTab.groups
+  }, [activeTab])
+
+  const filteredGroups = useMemo(() => {
+    if (!activeTab) return []
+    if (activeGroupId === 'all') return activeTab.groups
+    return activeTab.groups.filter(group => group.id === activeGroupId)
+  }, [activeTab, activeGroupId])
+
+  const totalTutorialsCount = useMemo(() => {
+    if (!activeTab) return 0
+    return activeTab.groups.reduce((total, group) => total + group.tutorials.length, 0)
+  }, [activeTab])
 
   // 创建爱心飘出动画
   const createHeartAnimation = (event: React.MouseEvent) => {
@@ -50,7 +78,7 @@ export default function Home() {
     }
   }
 
-  // 加载配置（优先使用临时配置）
+  // 加载配置（优先使用临时配置）- 优化为同步加载
   useEffect(() => {
     const tempConfig = localStorage.getItem('tempSiteConfig')
     if (tempConfig) {
@@ -62,20 +90,23 @@ export default function Home() {
         setSocialMedia(config.socialMedia || defaultSocialMedia)
         setIsPreviewMode(true)
         
-        // 设置默认激活的标签页
+        // 立即设置默认激活的标签页，确保内容立即渲染
         if (config.tabs && config.tabs.length > 0) {
           setActiveTabId(config.tabs[0].id)
+          setActiveGroupId('all') // 确保显示所有分组
         }
       } catch (error) {
         console.error('解析临时配置失败:', error)
-        // 使用默认配置
+        // 使用默认配置并立即设置
         setActiveTabId(defaultTabs[0]?.id || '')
+        setActiveGroupId('all')
       }
     } else {
-      // 使用默认配置
+      // 使用默认配置并立即设置
       setActiveTabId(defaultTabs[0]?.id || '')
+      setActiveGroupId('all')
     }
-  }, [])
+  }, []) // 保持空依赖数组，确保只执行一次
 
   // 清除临时配置
   const clearTempConfig = () => {
@@ -88,37 +119,6 @@ export default function Home() {
     setActiveGroupId('all')
     setIsPreviewMode(false)
   }
-
-  // 从配置文件中获取启用的社交媒体平台
-  const enabledSocialMedia = useMemo(() => 
-    Object.entries(socialMedia)
-      .filter(([_, config]) => config.enabled)
-      .map(([key, config]) => ({
-        key,
-        ...config
-      })), [socialMedia])
-
-  const activeTab = useMemo(() => 
-    tabs.find(tab => tab.id === activeTabId), [tabs, activeTabId])
-
-  // 获取当前标签页的所有分组
-  const availableGroups = useMemo(() => {
-    if (!activeTab) return []
-    return activeTab.groups
-  }, [activeTab])
-
-  // 获取过滤后的分组
-  const filteredGroups = useMemo(() => {
-    if (!activeTab) return []
-    if (activeGroupId === 'all') return activeTab.groups
-    return activeTab.groups.filter(group => group.id === activeGroupId)
-  }, [activeTab, activeGroupId])
-
-  // 计算总教程数量
-  const totalTutorialsCount = useMemo(() => {
-    if (!activeTab) return 0
-    return activeTab.groups.reduce((total, group) => total + group.tutorials.length, 0)
-  }, [activeTab])
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -159,7 +159,7 @@ export default function Home() {
               <br className="hidden sm:block" />
               请不要以任何形式将本站内容用于商业用途，包括但不限于：推广、商业引流等。
               <br className="hidden sm:block" />
-              感兴趣可以加入QQ群聊
+              感兴趣可加Q群交流，没有使用QQ习惯的不要加，不活跃会踢。
             </p>
             
             {/* 操作按钮 */}
@@ -171,6 +171,16 @@ export default function Home() {
                 <Bookmark className="w-4 h-4" />
                 <span>收藏本站</span>
               </button>
+              
+              <a
+                href="https://qm.qq.com/cgi-bin/qm/qr?k=lGBeDF_PNpmPJppdSeBkpeBGYrYCs0PY&jump_from=webapi&authKey=XVglBDvfExX5vSWU1a/59R5nPbf3Z7GLPAmVPSpB6oAVO4vx9gEcsKf5+Hmj6wyT"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="spotlight-btn bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-white text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <Users className="w-4 h-4" />
+                <span>加入QQ群</span>
+              </a>
               
               {donation.enabled && (
                 <button

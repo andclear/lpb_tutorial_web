@@ -205,34 +205,15 @@ a {
     opacity: 1;
   }
 
-  /* 按钮扫光效果 */
+  /* 简化的按钮扫光效果 */
 .spotlight-btn {
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.spotlight-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(50, 240, 140, 0.3) 50%,
-    transparent 100%
-  );
-  transform: translateX(-100%) skewX(-15deg);
-  transition: all 0.3s ease;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.spotlight-btn:hover::before {
-  animation: sweep-light 0.8s ease-out;
+.spotlight-btn:hover {
+  transform: translateY(-1px);
 }
   
   .spotlight-btn > * {
@@ -266,43 +247,15 @@ a {
     overflow: hidden;
   }
 
-  /* 教程卡片扫光动效 */
-  @keyframes sweep-light {
-    0% {
-      transform: translateX(-100%) skewX(-15deg);
-    }
-    100% {
-      transform: translateX(200%) skewX(-15deg);
-    }
-  }
-
+  /* 简化的教程卡片样式 - 移除复杂动画以提升渲染性能 */
   .tutorial-card {
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .tutorial-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(50, 240, 140, 0.3) 50%,
-      transparent 100%
-    );
-    transform: translateX(-100%) skewX(-15deg);
-    transition: all 0.3s ease;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .tutorial-card:hover::before {
-    animation: sweep-light 0.8s ease-out;
+  .tutorial-card:hover {
+    transform: translateY(-2px);
   }
 
   .tutorial-card:hover .tutorial-title {
@@ -310,12 +263,7 @@ a {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    transition: all 0.3s ease;
-  }
-
-  .tutorial-card > * {
-    position: relative;
-    z-index: 2;
+    transition: all 0.2s ease;
   }
 
   /* 自定义滚动条 */
