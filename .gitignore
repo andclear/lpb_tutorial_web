@@ -106,9 +106,48 @@ jspm_packages/
 tmp/
 temp/
 
-# other
+# Vercel
+.vercel
+
+# Turbo
+.turbo
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Storybook
+.storybook/
+storybook-static/
+
+# Testing
+.jest/
+__tests__/coverage/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Local development
+.local/
+.cache/
+
+# Documentation (development only)
 开发文档.md
+DEVELOPMENT.md
 
 # Lock files (uncomment if you want to ignore them)
 # package-lock.json
 # yarn.lock
+
+# macOS specific
+.AppleDouble
+.LSOverride
+
+# Windows specific
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux specific
+*~

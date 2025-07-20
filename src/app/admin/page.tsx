@@ -1,17 +1,369 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Plus, Trash2, Download, Eye, Save, ArrowLeft, ExternalLink, Monitor, X, Heart, Share2, BookOpen, ChevronDown, ChevronRight, Tag, Globe } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { Plus, Trash2, Download, Eye, Save, ArrowLeft, ExternalLink, Monitor, X, Heart, Share2, BookOpen, ChevronDown, ChevronRight, Tag, Globe, Search, GraduationCap, Brain, Lightbulb, Target, Award, BookMarked, Library, Code, Terminal, Cpu, Database, Smartphone, Server, Settings, Wrench, Hammer, Scissors, Paintbrush, Palette, Compass, Calculator, Video, Image, Music, Camera, Film, Mic, Headphones, Radio, Gamepad2, Joystick, Dice1, Puzzle, Trophy, Star, Briefcase, FileText, PieChart, BarChart, TrendingUp, DollarSign, CreditCard, Building, Sparkles, Pencil, Users, Clock, Calendar, Bookmark, GitBranch, Github, Cloud, Laptop, HardDrive, Wifi, Zap, Bug, Filter, Upload, Copy, Share, Link as LinkIcon, Lock, Play, Pause, Volume2, MessageCircle, Gift, Coffee, Mail, Phone, User, MapPin, ShoppingCart, Bot, Rocket, Activity, Home, Car, Plane, Train, Bike, Apple, Utensils, ShoppingBag, Shirt, Sun, Moon, Tablet, GripVertical } from 'lucide-react'
 import Link from 'next/link'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+// 本地卡片颜色配置
+const cardColors = {
+  purple: {
+    name: '紫粉渐变',
+    gradient: 'from-purple-500/20 to-pink-500/20',
+    border: 'border-purple-400/30',
+    hover: 'hover:border-purple-400/60',
+    text: 'from-purple-400 to-pink-400'
+  },
+  blue: {
+    name: '蓝青渐变',
+    gradient: 'from-blue-500/20 to-cyan-500/20',
+    border: 'border-blue-400/30',
+    hover: 'hover:border-blue-400/60',
+    text: 'from-blue-400 to-cyan-400'
+  },
+  green: {
+    name: '绿翠渐变',
+    gradient: 'from-green-500/20 to-emerald-500/20',
+    border: 'border-green-400/30',
+    hover: 'hover:border-green-400/60',
+    text: 'from-green-400 to-emerald-400'
+  },
+  orange: {
+    name: '橙红渐变',
+    gradient: 'from-orange-500/20 to-red-500/20',
+    border: 'border-orange-400/30',
+    hover: 'hover:border-orange-400/60',
+    text: 'from-orange-400 to-red-400'
+  },
+  indigo: {
+    name: '靛紫渐变',
+    gradient: 'from-indigo-500/20 to-purple-500/20',
+    border: 'border-indigo-400/30',
+    hover: 'hover:border-indigo-400/60',
+    text: 'from-indigo-400 to-purple-400'
+  },
+  teal: {
+    name: '青绿渐变',
+    gradient: 'from-teal-500/20 to-green-500/20',
+    border: 'border-teal-400/30',
+    hover: 'hover:border-teal-400/60',
+    text: 'from-teal-400 to-green-400'
+  },
+  rose: {
+    name: '玫粉渐变',
+    gradient: 'from-rose-500/20 to-pink-500/20',
+    border: 'border-rose-400/30',
+    hover: 'hover:border-rose-400/60',
+    text: 'from-rose-400 to-pink-400'
+  },
+  amber: {
+    name: '琥珀渐变',
+    gradient: 'from-amber-500/20 to-orange-500/20',
+    border: 'border-amber-400/30',
+    hover: 'hover:border-amber-400/60',
+    text: 'from-amber-400 to-orange-400'
+  }
+};
+
+// 本地卡片图标配置
+const cardIcons = {
+  '学习教育': {
+    name: '学习教育',
+    icons: ['BookOpen', 'GraduationCap', 'Brain', 'Lightbulb', 'Target', 'Award', 'BookMarked', 'Library', 'Pencil', 'Users', 'Clock', 'Calendar', 'Bookmark']
+  },
+  '技术开发': {
+    name: '技术开发',
+    icons: ['Code', 'Terminal', 'Cpu', 'Database', 'Globe', 'Smartphone', 'Monitor', 'Server', 'GitBranch', 'Github', 'Cloud', 'Laptop', 'HardDrive', 'Wifi', 'Zap', 'Bug']
+  },
+  '工具实用': {
+    name: '工具实用',
+    icons: ['Settings', 'Wrench', 'Hammer', 'Scissors', 'Paintbrush', 'Palette', 'Compass', 'Calculator', 'Search', 'Filter', 'Download', 'Upload', 'Copy', 'Share', 'LinkIcon', 'Lock']
+  },
+  '媒体内容': {
+    name: '媒体内容',
+    icons: ['Video', 'Image', 'Music', 'Camera', 'Film', 'Mic', 'Headphones', 'Radio', 'Play', 'Pause', 'Volume2', 'MessageCircle']
+  },
+  '游戏娱乐': {
+    name: '游戏娱乐',
+    icons: ['Gamepad2', 'Joystick', 'Dice1', 'Puzzle', 'Trophy', 'Star', 'Heart', 'Sparkles', 'Gift', 'Coffee']
+  },
+  '商业办公': {
+    name: '商业办公',
+    icons: ['Briefcase', 'FileText', 'PieChart', 'BarChart', 'TrendingUp', 'DollarSign', 'CreditCard', 'Building', 'Mail', 'Phone', 'User', 'MapPin', 'ShoppingCart']
+  },
+  '生活其他': {
+    name: '生活其他',
+    icons: ['Bot', 'Rocket', 'Activity', 'Home', 'Car', 'Plane', 'Train', 'Bike', 'Apple', 'Utensils', 'ShoppingBag', 'Shirt', 'Sun', 'Moon', 'Tablet']
+  }
+};
+
+// 可拖拽的教程项组件
+interface SortableTutorialItemProps {
+  tutorial: Tutorial
+  tabId: string
+  groupId: string
+  isCollapsed: boolean
+  onToggleCollapse: (tutorialId: string) => void
+  onUpdate: (tabId: string, groupId: string, tutorialId: string, field: keyof Tutorial, value: string) => void
+  onDelete: (tabId: string, groupId: string, tutorialId: string) => void
+  onSelectIcon: (tutorialId: string) => void
+  cardColors: any
+  getIconComponent: (iconName: string) => any
+  getGradientColorsForPreview: (gradientClass: string) => string
+}
+
+function SortableTutorialItem({
+  tutorial,
+  tabId,
+  groupId,
+  isCollapsed,
+  onToggleCollapse,
+  onUpdate,
+  onDelete,
+  onSelectIcon,
+  cardColors,
+  getIconComponent,
+  getGradientColorsForPreview
+}: SortableTutorialItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: tutorial.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-slate-500/20 rounded-lg border border-slate-400/20 overflow-hidden ${
+        isDragging ? 'z-50 shadow-2xl' : ''
+      }`}
+    >
+      {/* 教程头部 - 始终显示 */}
+      <div className="flex items-center justify-between p-4 bg-slate-500/10">
+        <div className="flex items-center gap-3 flex-1">
+          {/* 拖拽手柄 - 只在折叠状态下显示 */}
+          {isCollapsed && (
+            <div
+              {...attributes}
+              {...listeners}
+              className="flex items-center justify-center w-6 h-6 rounded hover:bg-slate-600/50 transition-colors cursor-grab active:cursor-grabbing"
+              title="拖拽排序"
+            >
+              <GripVertical className="w-4 h-4 text-slate-400" />
+            </div>
+          )}
+          
+          <button
+            onClick={() => onToggleCollapse(tutorial.id)}
+            className="flex items-center justify-center w-6 h-6 rounded hover:bg-slate-600/50 transition-colors"
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-400" />
+            )}
+          </button>
+          <input
+            type="text"
+            value={tutorial.title}
+            onChange={(e) => onUpdate(tabId, groupId, tutorial.id, 'title', e.target.value)}
+            placeholder="教程标题"
+            className="font-medium bg-transparent border-none focus:outline-none text-white placeholder-slate-400 flex-1"
+          />
+          {tutorial.category && (
+            <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs">
+              {tutorial.category}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => onDelete(tabId, groupId, tutorial.id)}
+          className="flex items-center gap-1 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded text-sm transition-all duration-200 hover:scale-105"
+        >
+          <Trash2 className="w-3 h-3" />
+          删除
+        </button>
+      </div>
+
+      {/* 教程详细配置 - 可折叠 */}
+      {!isCollapsed && (
+        <div className="p-4 border-t border-slate-400/20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium mb-2 text-slate-300">教程链接</label>
+              <input
+                type="text"
+                value={tutorial.linkUrl}
+                onChange={(e) => onUpdate(tabId, groupId, tutorial.id, 'linkUrl', e.target.value)}
+                placeholder="教程链接"
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-2 text-slate-300">分类标签</label>
+              <input
+                type="text"
+                value={tutorial.category || ''}
+                onChange={(e) => onUpdate(tabId, groupId, tutorial.id, 'category', e.target.value)}
+                placeholder="如：文字教程、视频教程"
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-2 text-slate-300">教程描述</label>
+              <textarea
+                value={tutorial.remark}
+                onChange={(e) => onUpdate(tabId, groupId, tutorial.id, 'remark', e.target.value)}
+                placeholder="教程详细描述"
+                rows={2}
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400 resize-none"
+              />
+            </div>
+          </div>
+          
+          {/* 卡片样式配置 */}
+          <div className="mt-6 pt-4 border-t border-slate-400/20">
+            <h4 className="text-sm font-medium text-slate-300 mb-4">卡片样式配置</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* 颜色主题选择 */}
+              <div>
+                <label className="block text-xs font-medium mb-2 text-slate-300">颜色主题</label>
+                <div className="space-y-3">
+                  {/* 第一行颜色 */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {Object.entries(cardColors).slice(0, 4).map(([key, colorConfig]: [string, any]) => (
+                      <button
+                        key={key}
+                        onClick={() => onUpdate(tabId, groupId, tutorial.id, 'colorTheme', key)}
+                        className={`w-full h-8 rounded-lg border-2 transition-all duration-200 hover:scale-105 relative overflow-hidden ${
+                          tutorial.colorTheme === key ? 'border-white shadow-lg' : 'border-slate-600 hover:border-slate-400'
+                        }`}
+                        title={colorConfig.name}
+                        style={{
+                          background: `linear-gradient(135deg, ${getGradientColorsForPreview(colorConfig.gradient)})`
+                        }}
+                      >
+                        {/* 透明度叠加层，模拟主页面效果 */}
+                        <div className="absolute inset-0 bg-slate-800/40 backdrop-blur-sm"></div>
+                        {/* 选中状态指示器 */}
+                        {tutorial.colorTheme === key && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full shadow-lg"></div>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {/* 第二行颜色 */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {Object.entries(cardColors).slice(4).map(([key, colorConfig]: [string, any]) => (
+                      <button
+                        key={key}
+                        onClick={() => onUpdate(tabId, groupId, tutorial.id, 'colorTheme', key)}
+                        className={`w-full h-8 rounded-lg border-2 transition-all duration-200 hover:scale-105 relative overflow-hidden ${
+                          tutorial.colorTheme === key ? 'border-white shadow-lg' : 'border-slate-600 hover:border-slate-400'
+                        }`}
+                        title={colorConfig.name}
+                        style={{
+                          background: `linear-gradient(135deg, ${getGradientColorsForPreview(colorConfig.gradient)})`
+                        }}
+                      >
+                        {/* 透明度叠加层，模拟主页面效果 */}
+                        <div className="absolute inset-0 bg-slate-800/40 backdrop-blur-sm"></div>
+                        {/* 选中状态指示器 */}
+                        {tutorial.colorTheme === key && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full shadow-lg"></div>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-2 text-xs text-slate-400">
+                  当前选择: {cardColors[tutorial.colorTheme as keyof typeof cardColors]?.name || '蓝青'}
+                </div>
+              </div>
+              
+              {/* 图标选择 */}
+              <div>
+                <label className="block text-xs font-medium mb-2 text-slate-300">卡片图标</label>
+                <button
+                  onClick={() => onSelectIcon(tutorial.id)}
+                  className={`w-full h-8 bg-slate-600/50 hover:bg-slate-600/70 rounded-lg border ${cardColors[tutorial.colorTheme as keyof typeof cardColors || 'blue'].border} flex items-center justify-center gap-2 transition-colors`}
+                >
+                  {(() => {
+                    const IconComponent = getIconComponent(tutorial.icon || 'BookOpen')
+                    return <IconComponent className="w-4 h-4 text-white" />
+                  })()}
+                  <span className="text-white text-xs">选择图标</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// 图标映射
+const iconMap = {
+  BookOpen, GraduationCap, Brain, Lightbulb, Target, Award, BookMarked, Library,
+  Code, Terminal, Cpu, Database, Globe, Smartphone, Monitor, Server,
+  Settings, Wrench, Hammer, Scissors, Paintbrush, Palette, Compass, Calculator,
+  Video, Image, Music, Camera, Film, Mic, Headphones, Radio,
+  Gamepad2, Joystick, Dice1, Puzzle, Trophy, Star, Heart, Sparkles,
+  Briefcase, FileText, PieChart, BarChart, TrendingUp, DollarSign, CreditCard, Building,
+  // 新增图标
+  Pencil, Users, Clock, Calendar, Bookmark,
+  GitBranch, Github, Cloud, Laptop, HardDrive, Wifi, Zap, Bug,
+  Search, Filter, Download, Upload, Copy, Share, LinkIcon, Lock,
+  Play, Pause, Volume2, MessageCircle,
+  Gift, Coffee,
+  Mail, Phone, User, MapPin, ShoppingCart,
+  Bot, Rocket, Activity,
+  Home, Car, Plane, Train, Bike, Apple, Utensils, ShoppingBag, Shirt, Sun, Moon, Tablet,
+  GripVertical
+}
 
 // 类型定义
 interface Tutorial {
   id: string
   title: string
-  coverUrl: string
   linkUrl: string
   remark: string
   category?: string
+  colorTheme?: string
+  icon?: string
 }
 
 interface Group {
@@ -31,11 +383,18 @@ interface SiteInfo {
   footerText: string
 }
 
+interface PaymentOption {
+  id: string;
+  name: string;
+  qrCodeUrl: string;
+  color: string;
+}
+
 interface Donation {
-  enabled: boolean
-  title: string
-  text: string
-  qrCodeUrl: string
+  enabled: boolean;
+  title: string;
+  text: string;
+  paymentOptions: PaymentOption[];
 }
 
 interface SocialMedia {
@@ -63,6 +422,20 @@ export default function AdminPage() {
   const [selectedTabFilter, setSelectedTabFilter] = useState<string>('all')
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>('all')
   const [collapsedTutorials, setCollapsedTutorials] = useState<Set<string>>(new Set()) // 折叠状态
+  
+  // 卡片配置状态
+  const [selectedTutorial, setSelectedTutorial] = useState<string>('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [showIconPicker, setShowIconPicker] = useState(false)
+
+  // 拖拽排序传感器配置
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   // 加载配置文件
   useEffect(() => {
@@ -72,7 +445,7 @@ export default function AdminPage() {
   const loadConfig = async () => {
     try {
       // 动态导入配置文件
-      const configModule = await import('../../site.config.js')
+      const configModule = await import('@/site.config.js')
       const loadedConfig: ConfigData = {
         siteInfo: configModule.siteInfo,
         donation: configModule.donation,
@@ -100,6 +473,58 @@ export default function AdminPage() {
   const generateId = (prefix: string) => {
     return `${prefix}${Date.now()}`
   }
+
+  // 获取图标组件
+  const getIconComponent = (iconName: string) => {
+    return iconMap[iconName as keyof typeof iconMap] || BookOpen
+  }
+
+  // 获取颜色预览样式（匹配主页面透明度效果）
+  const getGradientColorsForPreview = (gradientClass: string): string => {
+    const colorMap: { [key: string]: string } = {
+      'from-purple-500/20 to-pink-500/20': 'rgba(168, 85, 247, 0.5), rgba(236, 72, 153, 0.5)',
+      'from-blue-500/20 to-cyan-500/20': 'rgba(59, 130, 246, 0.5), rgba(6, 182, 212, 0.5)',
+      'from-green-500/20 to-emerald-500/20': 'rgba(34, 197, 94, 0.5), rgba(16, 185, 129, 0.5)',
+      'from-orange-500/20 to-red-500/20': 'rgba(249, 115, 22, 0.5), rgba(239, 68, 68, 0.5)',
+      'from-indigo-500/20 to-purple-500/20': 'rgba(99, 102, 241, 0.5), rgba(168, 85, 247, 0.5)',
+      'from-teal-500/20 to-green-500/20': 'rgba(20, 184, 166, 0.5), rgba(34, 197, 94, 0.5)',
+      'from-rose-500/20 to-pink-500/20': 'rgba(244, 63, 94, 0.5), rgba(236, 72, 153, 0.5)',
+      'from-amber-500/20 to-orange-500/20': 'rgba(245, 158, 11, 0.5), rgba(249, 115, 22, 0.5)'
+    }
+    return colorMap[gradientClass] || 'rgba(59, 130, 246, 0.5), rgba(6, 182, 212, 0.5)'
+  }
+
+  // 过滤图标
+  const filteredIcons = useMemo(() => {
+    const allIcons: Array<{name: string, component: string, category: string}> = []
+    
+    // 添加空值检查
+    if (cardIcons && typeof cardIcons === 'object') {
+      Object.entries(cardIcons).forEach(([categoryName, categoryData]) => {
+        if (selectedCategory === 'all' || selectedCategory === categoryName) {
+          if (categoryData && categoryData.icons && Array.isArray(categoryData.icons)) {
+            categoryData.icons.forEach((iconName: string) => {
+              // 确保iconName是字符串且不为空
+              if (typeof iconName === 'string' && iconName) {
+                const iconNameLower = iconName.toLowerCase()
+                const searchTermLower = searchTerm.toLowerCase()
+                
+                if (iconNameLower.includes(searchTermLower)) {
+                  allIcons.push({ 
+                    name: iconName, 
+                    component: iconName, 
+                    category: categoryName 
+                  })
+                }
+              }
+            })
+          }
+        }
+      })
+    }
+    
+    return allIcons
+  }, [searchTerm, selectedCategory])
 
   // 折叠功能辅助函数
   const toggleTutorialCollapse = (tutorialId: string) => {
@@ -187,6 +612,47 @@ export default function AdminPage() {
       donation: {
         ...config.donation,
         [field]: value
+      }
+    })
+  }
+
+  const updatePaymentOption = (index: number, field: keyof PaymentOption, value: string) => {
+    if (!config) return
+    setConfig({
+      ...config,
+      donation: {
+        ...config.donation,
+        paymentOptions: config.donation.paymentOptions.map((option, i) => 
+          i === index ? { ...option, [field]: value } : option
+        )
+      }
+    })
+  }
+
+  const addPaymentOption = () => {
+    if (!config) return
+    const newOption: PaymentOption = {
+      id: `payment_${Date.now()}`,
+      name: '新支付方式',
+      qrCodeUrl: '/images/default-qrcode.svg',
+      color: '#000000'
+    }
+    setConfig({
+      ...config,
+      donation: {
+        ...config.donation,
+        paymentOptions: [...config.donation.paymentOptions, newOption]
+      }
+    })
+  }
+
+  const removePaymentOption = (index: number) => {
+    if (!config) return
+    setConfig({
+      ...config,
+      donation: {
+        ...config.donation,
+        paymentOptions: config.donation.paymentOptions.filter((_, i) => i !== index)
       }
     })
   }
@@ -337,10 +803,11 @@ export default function AdminPage() {
     const newTutorial: Tutorial = {
       id: generateId('t'),
       title: '新教程',
-      coverUrl: '',
       linkUrl: '',
       remark: '',
-      category: ''
+      category: '',
+      colorTheme: 'blue',
+      icon: 'BookOpen'
     }
     setConfig({
       ...config,
@@ -413,6 +880,40 @@ export default function AdminPage() {
     })
   }
 
+  // 拖拽排序处理函数
+  const handleDragEnd = (event: DragEndEvent, tabId: string, groupId: string) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    if (!config) return
+
+    setConfig({
+      ...config,
+      tabs: config.tabs.map(tab => 
+        tab.id === tabId 
+          ? { 
+              ...tab, 
+              groups: tab.groups.map(group => 
+                group.id === groupId 
+                  ? { 
+                      ...group, 
+                      tutorials: (() => {
+                        const oldIndex = group.tutorials.findIndex(tutorial => tutorial.id === active.id)
+                        const newIndex = group.tutorials.findIndex(tutorial => tutorial.id === over.id)
+                        return arrayMove(group.tutorials, oldIndex, newIndex)
+                      })()
+                    }
+                  : group
+              )
+            }
+          : tab
+      )
+    })
+  }
+
   // 生成配置文件内容
   const generateConfigFile = () => {
     if (!config) return ''
@@ -422,13 +923,19 @@ export default function AdminPage() {
 // 1. 全局站点信息
 export const siteInfo = ${JSON.stringify(config.siteInfo, null, 2)};
 
-// 2. 全局赞赏功能配置
+// 2. 全局赞赏配置
 export const donation = ${JSON.stringify(config.donation, null, 2)};
 
 // 3. 社交媒体配置
 export const socialMedia = ${JSON.stringify(config.socialMedia, null, 2)};
 
-// 4. 教程内容：标签页 -> 分组 -> 教程
+// 4. 卡片颜色主题配置
+export const cardColors = ${JSON.stringify(cardColors, null, 2)};
+
+// 5. 卡片图标配置
+export const cardIcons = ${JSON.stringify(cardIcons, null, 2)};
+
+// 6. 教程内容：标签页 -> 分组 -> 教程
 export const tabs = ${JSON.stringify(config.tabs, null, 2)};
 `
   }
@@ -630,7 +1137,7 @@ export const tabs = ${JSON.stringify(config.tabs, null, 2)};
                     onChange={(e) => updateDonation('enabled', e.target.checked)}
                     className="w-5 h-5 text-blue-600 bg-slate-700 border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
                   />
-                  <label className="text-sm font-medium text-slate-300">启用赞赏功能</label>
+                  <label className="text-sm font-medium text-slate-300">启用赞赏</label>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-3 text-slate-300">按钮标题</label>
@@ -652,15 +1159,94 @@ export const tabs = ${JSON.stringify(config.tabs, null, 2)};
                     placeholder="输入赞赏文案..."
                   />
                 </div>
+                
+                {/* 支付选项配置 */}
                 <div>
-                  <label className="block text-sm font-medium mb-3 text-slate-300">二维码图片路径</label>
-                  <input
-                    type="text"
-                    value={config.donation.qrCodeUrl}
-                    onChange={(e) => updateDonation('qrCodeUrl', e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-white placeholder-slate-400"
-                    placeholder="输入二维码图片路径..."
-                  />
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block text-sm font-medium text-slate-300">支付选项</label>
+                    <button
+                      onClick={addPaymentOption}
+                      className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-lg transition-all duration-200 text-sm font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                      添加支付方式
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {config.donation.paymentOptions.map((option, index) => (
+                      <div key={option.id} className="bg-slate-700/30 rounded-xl p-5 border border-slate-600/30">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-semibold text-white">支付方式 {index + 1}</h4>
+                          <button
+                            onClick={() => removePaymentOption(index)}
+                            className="px-3 py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg transition-all duration-200 flex items-center gap-2 text-sm"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            删除
+                          </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">ID</label>
+                            <input
+                              type="text"
+                              value={option.id}
+                              onChange={(e) => updatePaymentOption(index, 'id', e.target.value)}
+                              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-white placeholder-slate-400"
+                              placeholder="支付方式ID..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">名称</label>
+                            <input
+                              type="text"
+                              value={option.name}
+                              onChange={(e) => updatePaymentOption(index, 'name', e.target.value)}
+                              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-white placeholder-slate-400"
+                              placeholder="支付方式名称..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">二维码路径</label>
+                            <input
+                              type="text"
+                              value={option.qrCodeUrl}
+                              onChange={(e) => updatePaymentOption(index, 'qrCodeUrl', e.target.value)}
+                              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-white placeholder-slate-400"
+                              placeholder="二维码图片路径..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">品牌色</label>
+                            <div className="flex gap-2">
+                              <input
+                                type="color"
+                                value={option.color}
+                                onChange={(e) => updatePaymentOption(index, 'color', e.target.value)}
+                                className="w-12 h-12 bg-slate-700/50 border border-slate-600/50 rounded-xl cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={option.color}
+                                onChange={(e) => updatePaymentOption(index, 'color', e.target.value)}
+                                className="flex-1 px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-white placeholder-slate-400"
+                                placeholder="#000000"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {config.donation.paymentOptions.length === 0 && (
+                      <div className="text-center py-8 text-slate-400">
+                        <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>暂无支付选项，点击上方按钮添加</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -881,97 +1467,40 @@ export const tabs = ${JSON.stringify(config.tabs, null, 2)};
                             </div>
                           </div>
 
-                          <div className="space-y-3">
-                            {group.tutorials.map((tutorial) => {
-                              const isCollapsed = collapsedTutorials.has(tutorial.id)
-                              return (
-                                <div key={tutorial.id} className="bg-slate-500/20 rounded-lg border border-slate-400/20 overflow-hidden">
-                                  {/* 教程头部 - 始终显示 */}
-                                  <div className="flex items-center justify-between p-4 bg-slate-500/10">
-                                    <div className="flex items-center gap-3 flex-1">
-                                      <button
-                                        onClick={() => toggleTutorialCollapse(tutorial.id)}
-                                        className="flex items-center justify-center w-6 h-6 rounded hover:bg-slate-600/50 transition-colors"
-                                      >
-                                        {isCollapsed ? (
-                                          <ChevronRight className="w-4 h-4 text-slate-400" />
-                                        ) : (
-                                          <ChevronDown className="w-4 h-4 text-slate-400" />
-                                        )}
-                                      </button>
-                                      <input
-                                        type="text"
-                                        value={tutorial.title}
-                                        onChange={(e) => updateTutorial(tab.id, group.id, tutorial.id, 'title', e.target.value)}
-                                        placeholder="教程标题"
-                                        className="font-medium bg-transparent border-none focus:outline-none text-white placeholder-slate-400 flex-1"
-                                      />
-                                      {tutorial.category && (
-                                        <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs">
-                                          {tutorial.category}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <button
-                                      onClick={() => deleteTutorial(tab.id, group.id, tutorial.id)}
-                                      className="flex items-center gap-1 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded text-sm transition-all duration-200 hover:scale-105"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                      删除
-                                    </button>
-                                  </div>
-
-                                  {/* 教程详细配置 - 可折叠 */}
-                                  {!isCollapsed && (
-                                    <div className="p-4 border-t border-slate-400/20">
-                                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <div>
-                                          <label className="block text-xs font-medium mb-2 text-slate-300">封面图片URL</label>
-                                          <input
-                                            type="text"
-                                            value={tutorial.coverUrl}
-                                            onChange={(e) => updateTutorial(tab.id, group.id, tutorial.id, 'coverUrl', e.target.value)}
-                                            placeholder="图片链接"
-                                            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium mb-2 text-slate-300">教程链接</label>
-                                          <input
-                                            type="text"
-                                            value={tutorial.linkUrl}
-                                            onChange={(e) => updateTutorial(tab.id, group.id, tutorial.id, 'linkUrl', e.target.value)}
-                                            placeholder="教程链接"
-                                            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium mb-2 text-slate-300">分类标签</label>
-                                          <input
-                                            type="text"
-                                            value={tutorial.category || ''}
-                                            onChange={(e) => updateTutorial(tab.id, group.id, tutorial.id, 'category', e.target.value)}
-                                            placeholder="如：文字教程、视频教程"
-                                            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium mb-2 text-slate-300">教程描述</label>
-                                          <textarea
-                                            value={tutorial.remark}
-                                            onChange={(e) => updateTutorial(tab.id, group.id, tutorial.id, 'remark', e.target.value)}
-                                            placeholder="教程详细描述"
-                                            rows={2}
-                                            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all text-white text-sm placeholder-slate-400 resize-none"
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
+                          <DndContext
+                            sensors={sensors}
+                            onDragEnd={(event) => handleDragEnd(event, tab.id, group.id)}
+                          >
+                            <SortableContext
+                              items={group.tutorials.map(t => t.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              <div className="space-y-3">
+                                {group.tutorials.map((tutorial) => {
+                                  const isCollapsed = collapsedTutorials.has(tutorial.id)
+                                  return (
+                                    <SortableTutorialItem
+                                      key={tutorial.id}
+                                      tutorial={tutorial}
+                                      tabId={tab.id}
+                                      groupId={group.id}
+                                      isCollapsed={isCollapsed}
+                                      onToggleCollapse={toggleTutorialCollapse}
+                                      onUpdate={updateTutorial}
+                                      onDelete={deleteTutorial}
+                                      onSelectIcon={(tutorialId) => {
+                                        setSelectedTutorial(tutorialId)
+                                        setShowIconPicker(true)
+                                      }}
+                                      cardColors={cardColors}
+                                      getIconComponent={getIconComponent}
+                                      getGradientColorsForPreview={getGradientColorsForPreview}
+                                    />
+                                  )
+                                })}
+                              </div>
+                            </SortableContext>
+                          </DndContext>
                         </div>
                       ))}
                     </div>
@@ -981,6 +1510,99 @@ export const tabs = ${JSON.stringify(config.tabs, null, 2)};
             </div>
           )}
         </div>
+        
+        {/* 图标选择器模态框 */}
+        {showIconPicker && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-2xl border border-slate-600 max-w-4xl w-full max-h-[80vh] overflow-hidden">
+              <div className="p-6 border-b border-slate-600">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-white">选择图标</h3>
+                  <button
+                    onClick={() => setShowIconPicker(false)}
+                    className="w-8 h-8 bg-slate-600 hover:bg-slate-500 rounded-full flex items-center justify-center text-white transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* 搜索和分类过滤 */}
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="搜索图标..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full h-10 bg-slate-700 border border-slate-600 rounded-lg pl-10 pr-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-400"
+                    />
+                  </div>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="h-10 bg-slate-700 border border-slate-600 rounded-lg px-3 text-white focus:outline-none focus:border-blue-400"
+                  >
+                    <option value="all">所有分类</option>
+                    {cardIcons && typeof cardIcons === 'object' && Object.keys(cardIcons).map(category => {
+                      const categoryData = cardIcons[category as keyof typeof cardIcons];
+                      return (
+                        <option key={category} value={category}>
+                          {categoryData?.name || category}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+
+              {/* 图标网格 */}
+              <div className="p-6 overflow-y-auto max-h-96">
+                <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 gap-3">
+                  {filteredIcons.map((icon, index) => {
+                    const IconComponent = getIconComponent(icon.component)
+                    const currentTutorial = config?.tabs.flatMap(tab => 
+                      tab.groups.flatMap(group => group.tutorials)
+                    ).find(t => t.id === selectedTutorial)
+                    const isSelected = currentTutorial?.icon === icon.component
+                    
+                    return (
+                      <button
+                        key={`${icon.category}-${index}`}
+                        onClick={() => {
+                          // 找到对应的教程并更新图标
+                          config?.tabs.forEach(tab => {
+                            tab.groups.forEach(group => {
+                              const tutorial = group.tutorials.find(t => t.id === selectedTutorial)
+                              if (tutorial) {
+                                updateTutorial(tab.id, group.id, tutorial.id, 'icon', icon.component)
+                              }
+                            })
+                          })
+                          setShowIconPicker(false)
+                        }}
+                        className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${
+                          isSelected 
+                            ? 'bg-blue-500/20 border-blue-400 text-blue-400' 
+                            : 'bg-slate-700/50 border-slate-600 text-slate-300 hover:border-slate-400 hover:text-white'
+                        }`}
+                        title={icon.name}
+                      >
+                        <IconComponent className="w-5 h-5" />
+                      </button>
+                    )
+                  })}
+                </div>
+                
+                {filteredIcons.length === 0 && (
+                  <div className="text-center py-8 text-slate-400">
+                    没有找到匹配的图标
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

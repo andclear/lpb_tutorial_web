@@ -14,6 +14,8 @@
 - 🔖 **收藏引导**: 一键引导用户收藏网站
 - 🏷️ **智能分类**: 支持标签页和分组的双重分类系统
 - 📊 **过滤功能**: 支持按标签页和分组进行内容过滤
+- 🎨 **多彩主题**: 8种渐变色彩主题，支持透明度效果
+- 🎯 **丰富图标**: 100+精选图标，涵盖6大分类
 
 ## 🛠️ 技术栈
 
@@ -83,7 +85,7 @@ export const donation = {
   enabled: true, // 是否启用赞赏功能
   title: "支持一下",
   text: "如果您觉得我的教程对您有帮助\n可以请我吃一个珍珠奶茶里的珍珠~",
-  qrCodeUrl: "/images/donation-qrcode.svg", // 二维码图片路径
+  qrCodeUrl: "/images/wechat.png", // 二维码图片路径
 };
 ```
 
@@ -119,10 +121,11 @@ export const tabs = [
           {
             id: 't101',
             title: "从零搭建一个博客网站",
-            coverUrl: "/images/covers/nextjs-blog.svg",
             linkUrl: "https://juejin.cn/post/xxxxxxxxxxxx",
             remark: "本教程将带你使用 Next.js 从零开始搭建现代化博客网站",
-            category: "文字教程", 
+            category: "文字教程",
+            colorTheme: "blue",
+            icon: "Code"
           }
         ],
       },
@@ -131,23 +134,40 @@ export const tabs = [
 ];
 ```
 
+教程对象支持的字段：
+- **id**: 教程唯一标识符
+- **title**: 教程标题
+- **linkUrl**: 教程链接地址
+- **remark**: 教程详细描述
+- **category**: 分类标签（可选）
+- **colorTheme**: 颜色主题（可选，默认blue）
+- **icon**: 图标名称（可选，默认BookOpen）
+
 ## 🎯 功能说明
 
 ### 教程卡片
-- 点击卡片跳转到教程链接
-- 悬停右上角信息图标查看详细说明
-- 左下角显示教程分类（如果配置了 category 字段）
+- **渐变背景**: 8种精美渐变色彩主题，支持透明度效果
+- **丰富图标**: 100+精选图标，涵盖学习教育、技术开发、工具实用、媒体内容、游戏娱乐、商业办公6大分类
+- **交互体验**: 点击卡片跳转到教程链接，悬停右上角信息图标查看详细说明
+- **分类标签**: 左下角显示教程分类（如果配置了 category 字段）
 
 ### 管理后台
 - **站点信息**: 编辑网站标题和页脚文本
 - **赞赏配置**: 管理赞赏功能的开关和内容
 - **社交媒体**: 添加、编辑、删除社交媒体链接
 - **教程内容**: 管理标签页、分组和教程，支持折叠和过滤
+- **颜色选择器**: 长方形样式，支持透明度预览
+- **图标选择器**: 分类展示，快速选择合适图标
 
 ### 过滤功能
-- 按标签页过滤：显示特定标签页下的所有内容
-- 按分组过滤：显示特定分组下的教程
-- 智能联动：切换过滤器时自动重置另一个过滤器
+- **标签页过滤**: 显示特定标签页下的所有内容
+- **分组过滤**: 显示特定分组下的教程（右侧文字链接形式）
+- **智能联动**: 切换过滤器时自动重置另一个过滤器
+
+### 特色功能
+- **收藏引导**: 爱心动画提示用户收藏网站
+- **预览模式**: 管理后台实时预览功能
+- **响应式设计**: 完美适配各种设备尺寸
 
 ## 🚀 部署
 
@@ -170,48 +190,100 @@ npm run build
 ## 🎨 自定义
 
 ### 修改样式
-- 全局样式：编辑 `src/app/globals.css`
-- 组件样式：使用 Tailwind CSS 类名
-- 主题色彩：在 `tailwind.config.js` 中自定义颜色
+- **全局样式**: 编辑 `src/app/globals.css`
+- **组件样式**: 使用 Tailwind CSS 类名
+- **主题色彩**: 在 `src/site.config.js` 中的 `cardColors` 配置
 
 ### 添加新功能
-- 组件文件：`src/components/`
-- 页面文件：`src/app/`
-- 配置文件：`src/site.config.js`
+- **组件文件**: `src/components/`
+- **页面文件**: `src/app/`
+- **配置文件**: `src/site.config.js`
 
-### 自定义Logo
-- 替换 `public/images/logo.svg` 文件
-- 或在管理后台中修改logo路径
+### 自定义图标
+- **添加新图标**: 在 `src/site.config.js` 的 `cardIcons` 中添加
+- **图标分类**: 支持学习教育、技术开发、工具实用、媒体内容、游戏娱乐、商业办公6大分类
+
+### 自定义颜色主题
+- **添加新主题**: 在 `src/site.config.js` 的 `cardColors` 中添加
+- **透明度配置**: 支持自定义透明度效果
 
 ## 📁 项目结构
 
 ```
 lpb_tutorial_web/
 ├── public/                 # 静态资源
-│   └── images/            # 图片资源
-│       ├── covers/        # 教程封面图
-│       ├── logo.svg       # 网站Logo
-│       └── donation-qrcode.svg # 赞赏二维码
+│   └── images/         # 静态图片资源
+    │       ├── mylogo.png     # 网站Logo
+    │       ├── wechat.png     # 微信赞赏码
+    │       └── alipay.png     # 支付宝赞赏码
 ├── src/
 │   ├── app/               # Next.js App Router
 │   │   ├── admin/         # 管理后台页面
+│   │   │   └── page.tsx   # 管理后台主页
 │   │   ├── globals.css    # 全局样式
 │   │   ├── layout.tsx     # 根布局
 │   │   └── page.tsx       # 首页
 │   ├── components/        # React 组件
-│   │   ├── BookmarkModal.tsx
-│   │   ├── DonationModal.tsx
-│   │   └── TutorialCard.tsx
+│   │   ├── BookmarkModal.tsx    # 收藏引导弹窗
+│   │   ├── DonationModal.tsx    # 赞赏弹窗
+│   │   └── TutorialCard.tsx     # 教程卡片组件
 │   └── site.config.js     # 网站配置文件
-├── package.json
+├── package.json           # 项目依赖和脚本
 ├── tailwind.config.js     # Tailwind CSS 配置
 ├── tsconfig.json          # TypeScript 配置
-└── README.md
+├── next.config.js         # Next.js 配置
+├── postcss.config.js      # PostCSS 配置
+└── README.md              # 项目文档
 ```
+
+## 🎨 设计特色
+
+### 颜色主题
+- **紫粉渐变**: 优雅的紫色到粉色渐变
+- **蓝青渐变**: 清新的蓝色到青色渐变
+- **绿翠渐变**: 自然的绿色到翠绿渐变
+- **橙红渐变**: 活力的橙色到红色渐变
+- **靛紫渐变**: 深邃的靛蓝到紫色渐变
+- **青绿渐变**: 宁静的青色到绿色渐变
+- **玫粉渐变**: 浪漫的玫瑰到粉色渐变
+- **琥珀渐变**: 温暖的琥珀到橙色渐变
+
+### 图标分类
+- **学习教育**: 书本、学士帽、大脑、灯泡等14个图标
+- **技术开发**: 代码、终端、数据库、服务器等19个图标
+- **工具实用**: 设置、扳手、画笔、搜索等16个图标
+- **媒体内容**: 视频、图片、音乐、相机等12个图标
+- **游戏娱乐**: 游戏手柄、奖杯、星星、爱心等10个图标
+- **商业办公**: 公文包、文档、图表、邮件等16个图标
+
+## 🔧 开发指南
+
+### 添加新教程
+1. 在管理后台中点击"添加教程"
+2. 填写教程信息（标题、链接、描述等）
+3. 选择合适的颜色主题和图标
+4. 下载配置文件并替换 `src/site.config.js`
+
+### 自定义样式
+1. 修改 `src/app/globals.css` 调整全局样式
+2. 在组件中使用 Tailwind CSS 类名
+3. 在 `tailwind.config.js` 中扩展主题配置
+
+### 添加新页面
+1. 在 `src/app/` 目录下创建新的页面文件
+2. 使用 Next.js App Router 约定
+3. 支持嵌套路由和布局
 
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request 来改进这个项目。
+
+### 贡献指南
+1. Fork 本项目
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
 
 ## 📄 许可证
 
@@ -220,6 +292,11 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 ## 🙏 致谢
 
 感谢所有为这个项目做出贡献的开发者和用户。
+
+特别感谢：
+- [Next.js](https://nextjs.org/) - 强大的React框架
+- [Tailwind CSS](https://tailwindcss.com/) - 实用的CSS框架
+- [Lucide React](https://lucide.dev/) - 精美的图标库
 
 ---
 
