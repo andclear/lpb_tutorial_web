@@ -2,6 +2,7 @@
 
 import { useState, memo, useMemo, useCallback } from 'react'
 import { Info, ExternalLink, BookOpen, Sparkles, GraduationCap, Brain, Lightbulb, Target, Award, BookMarked, Library, Code, Terminal, Cpu, Database, Globe, Smartphone, Monitor, Server, Settings, Wrench, Hammer, Scissors, Paintbrush, Palette, Compass, Calculator, Video, Image, Music, Camera, Film, Mic, Headphones, Radio, Gamepad2, Joystick, Dice1, Puzzle, Trophy, Star, Heart, Briefcase, FileText, PieChart, BarChart, TrendingUp, DollarSign, CreditCard, Building, Pencil, Users, Clock, Calendar, Bookmark, GitBranch, Github, Cloud, Laptop, HardDrive, Wifi, Zap, Bug, Search, Filter, Download, Upload, Copy, Share, Link as LinkIcon, Lock, Play, Pause, Volume2, MessageCircle, Gift, Coffee, Mail, Phone, User, MapPin, ShoppingCart, Bot, Rocket, Activity, Home, Car, Plane, Train, Bike, Apple, Utensils, ShoppingBag, Shirt, Sun, Moon, Tablet } from 'lucide-react'
+import TutorialDetailModal from './TutorialDetailModal'
 
 // 本地卡片颜色配置
 const cardColors = {
@@ -97,7 +98,7 @@ const iconMap = {
 }
 
 const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps) {
-  const [showTooltip, setShowTooltip] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   // 使用 useMemo 缓存颜色配置计算
   const colorConfig = useMemo(() => {
@@ -126,31 +127,42 @@ const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps)
   const borderColor = useMemo(() => getBorderColor(colorConfig.border), [colorConfig.border])
 
   // 使用 useCallback 优化事件处理函数
-  const handleTooltipToggle = useCallback((e: React.MouseEvent) => {
+  const handleDetailClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    setShowTooltip(!showTooltip)
-  }, [showTooltip])
-
-  const handleMouseEnter = useCallback(() => {
-    setShowTooltip(true)
+    e.stopPropagation()
+    setShowModal(true)
   }, [])
 
-  const handleMouseLeave = useCallback(() => {
-    setShowTooltip(false)
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false)
   }, [])
+
+  const handleCardClick = useCallback(() => {
+    const url = tutorial.linkUrl || `/waiting?id=${tutorial.id}&title=${encodeURIComponent(tutorial.title)}&description=${encodeURIComponent(tutorial.title)}&remark=${encodeURIComponent(tutorial.remark || '')}&color=${tutorial.colorTheme || 'blue'}`
+    
+    if (tutorial.linkUrl) {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    } else {
+      window.location.href = url
+    }
+  }, [tutorial])
 
   return (
-    <div className="relative group">
-      <div className={`tutorial-card bg-slate-800/60 backdrop-blur-lg rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-200 hover:transform hover:scale-[1.01] hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/30`} 
-           style={{ borderColor }}>
+    <>
+      <div className="relative group">
+        {/* 外部链接图标 - 放在卡片右上角 */}
+        {tutorial.linkUrl && (
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700/90 backdrop-blur-sm flex items-center justify-center border border-slate-600/50 shadow-lg">
+              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300" />
+            </div>
+          </div>
+        )}
         
-        {/* 可点击的主要内容区域 */}
-        <a
-          href={tutorial.linkUrl || `/waiting?id=${tutorial.id}&title=${encodeURIComponent(tutorial.title)}&description=${encodeURIComponent(tutorial.title)}&remark=${encodeURIComponent(tutorial.remark || '')}&color=${tutorial.colorTheme || 'blue'}`}
-          target={tutorial.linkUrl ? "_blank" : "_self"}
-          rel={tutorial.linkUrl ? "noopener noreferrer" : undefined}
-          className="block cursor-pointer"
-        >
+        <div className={`tutorial-card bg-slate-800/60 backdrop-blur-lg rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-200 hover:transform hover:scale-[1.01] hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/30 cursor-pointer`} 
+             style={{ borderColor }}
+             onClick={handleCardClick}>
+          
           {/* 装饰性头部区域 */}
           <div className="h-20 sm:h-24 lg:h-28 relative overflow-hidden"
                style={gradientStyle}>
@@ -165,15 +177,6 @@ const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps)
                  style={gradientStyle}>
               {IconComponent && <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />}
             </div>
-            
-            {/* 外部链接图标 */}
-            {tutorial.linkUrl && (
-              <div className="absolute top-2 right-0">
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-700/80 backdrop-blur-sm flex items-center justify-center border border-slate-600/50">
-                  <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-300" />
-                </div>
-              </div>
-            )}
           </div>
 
           {/* 标题区域 - 固定高度解决不一致问题 */}
@@ -185,68 +188,41 @@ const TutorialCard = memo(function TutorialCard({ tutorial }: TutorialCardProps)
               </h3>
             </div>
           </div>
-        </a>
 
-        {/* 底部操作区 */}
-        <div className="px-4 sm:px-5 lg:px-6 pb-4 sm:pb-5 lg:pb-6">
-          <div className="flex items-center justify-between">
-            {/* 角标显示 */}
-            <div className="flex items-center">
-              {tutorial.category && tutorial.category.trim() && (
-                <span className="backdrop-blur-sm text-white text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium shadow-lg"
-                      style={gradientStyle}>
-                  {tutorial.category}
-                </span>
-              )}
-            </div>
+          {/* 底部操作区 */}
+          <div className="px-4 sm:px-5 lg:px-6 pb-4 sm:pb-5 lg:pb-6">
+            <div className="flex items-center justify-between">
+              {/* 角标显示 */}
+              <div className="flex items-center">
+                {tutorial.category && tutorial.category.trim() && (
+                  <span className="backdrop-blur-sm text-white text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium shadow-lg"
+                        style={gradientStyle}>
+                    {tutorial.category}
+                  </span>
+                )}
+              </div>
 
-            {/* 详情按钮 */}
-            <div 
-              className="relative"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
+              {/* 详情按钮 */}
               <button
                 className="px-3 py-1.5 text-xs font-medium bg-slate-700/50 backdrop-blur-sm rounded-lg flex items-center gap-1.5 transition-all duration-200 hover:scale-105 hover:shadow-lg text-slate-300 hover:text-white"
                 style={{ borderColor }}
-                onClick={handleTooltipToggle}
+                onClick={handleDetailClick}
               >
                 <Info className="w-3 h-3" />
-                <span>详情&gt;&gt;</span>
+                <span>详情</span>
               </button>
-
-              {/* 优化的详情提示框 */}
-              {showTooltip && (
-                <div className="absolute bottom-full mb-2 right-0 w-56 max-w-[calc(100vw-2rem)] bg-slate-800/95 backdrop-blur-xl border border-slate-600/80 rounded-lg p-3 shadow-2xl z-50 transform transition-all duration-200">
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-semibold text-amber-400 mb-2">教程详情</h4>
-                    <div className="text-xs leading-relaxed text-slate-200">
-                      {tutorial.remark && tutorial.remark.trim() ? (
-                        <div className="space-y-1">
-                          {/* 如果备注较短，直接显示 */}
-                          {tutorial.remark.length <= 100 ? (
-                            <p>{tutorial.remark}</p>
-                          ) : (
-                            /* 如果备注较长，显示前100字符 */
-                            <div className="max-h-24 overflow-hidden">
-                              <p>{tutorial.remark.substring(0, 100)}...</p>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-slate-400 italic">暂无详细描述</p>
-                      )}
-                    </div>
-                  </div>
-                  {/* 箭头指示器 */}
-                  <div className="absolute top-full right-4 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-800/95"></div>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* 教程详情弹窗 */}
+      <TutorialDetailModal
+        tutorial={tutorial}
+        isOpen={showModal}
+        onClose={handleCloseModal}
+      />
+    </>
   )
 })
 

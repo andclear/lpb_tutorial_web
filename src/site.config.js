@@ -31,7 +31,7 @@ export const donation = {
 export const socialMedia = {
   "xiaohongshu": {
     "enabled": true,
-    "url": "https://www.xiaohongshu.com",
+    "url": "https://www.xiaohongshu.com/user/profile/5cdb84a0000000001001ac07?xsec_token=YBEBFD6jq1CALJb_kM4Ow728aGdZDGSogPD-ZQxkyGvoU=&xsec_source=app_share&xhsshare=CopyLink&appuid=5cdb84a0000000001001ac07&apptime=1753064058&share_id=a5079695a1a44512bb3b7176cfe5da06",
     "title": "小红书"
   },
   "douyin": {
@@ -40,8 +40,8 @@ export const socialMedia = {
     "title": "抖音"
   },
   "bilibili": {
-    "enabled": true,
-    "url": "https://www.bilibili.com",
+    "enabled": false,
+    "url": "https://b23.tv/xDm4g2j",
     "title": "Bilibili"
   }
 };
@@ -272,7 +272,7 @@ export const tabs = [
             "id": "t1752955473149",
             "title": "VPS云酒馆搭建教程",
             "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/UVKxw8VuziKBMXkYOapcSwznnIb?from=from_copylink",
-            "remark": "全网最强VPS搭建教程，基于Linux搭建，通过1Panel面板管理，包含部分数据迁移教程、数据备份教程（超好用，全网唯一）。支持在所有平台使用，包括iOS。",
+            "remark": "全网最强VPS搭建教程，基于Linux搭建，通过1Panel面板管理，包含部分数据迁移教程、数据备份教程（超好用，全网唯一）。\n\n支持在所有平台使用，包括iOS。",
             "category": "图文教程",
             "colorTheme": "amber",
             "icon": "Server"
@@ -281,7 +281,7 @@ export const tabs = [
             "id": "t1752955474516",
             "title": "Claw云酒馆搭建",
             "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/TohMwEPcpiIGPKkQHPYcAKhjnLf?from=from_copylink",
-            "remark": "请注意：Claw平台云酒馆是免费的，但是必须要有一个注册时间大于180天的Github账号。\n全网最强Claw酒馆搭建教程，包含数据迁移教程、自定义域名教程（超好用，全网唯一）。\n支持在所有平台使用，包括iOS。",
+            "remark": "请注意：Claw平台云酒馆是免费的，但是必须要有一个注册时间大于180天的Github账号。\n\n全网最强Claw酒馆搭建教程，包含数据迁移教程、自定义域名教程（超好用，全网唯一）。\n\n支持在所有平台使用，包括iOS。",
             "category": "图文教程",
             "colorTheme": "teal",
             "icon": "Globe"
@@ -305,7 +305,7 @@ export const tabs = [
             "id": "t106",
             "title": "Gemini 和 Deepseek API获取教程",
             "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/EbgawbWtwiJE9CkEEGDc4WFqn8b?from=from_copylink",
-            "remark": "本教程包含如何获取Gemini官方API、如何创建多个项目、轮询搭建链接。请注意，gemini api 无法直接连接，必须开梯子，新加坡、美国、日本节点，香港不行。或者可以通过搭建轮询解决。",
+            "remark": "本教程包含如何获取Gemini官方API、如何创建多个项目、轮询搭建链接。\n\n请注意，gemini api 无法直接连接，必须开梯子，新加坡、美国、日本节点，香港不行。或者可以通过搭建轮询解决。\n\n如果本教程链接失效，请及时与我联系（动了无良贩子蛋糕，被猛猛举报了）",
             "category": "图文教程",
             "colorTheme": "blue",
             "icon": "Cpu"
@@ -314,16 +314,16 @@ export const tabs = [
             "id": "t104",
             "title": "Hajimi轮询部署教程-Claw版",
             "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/F8cBw50u2iatr1kENEoci6P3nHs?from=from_copylink",
-            "remark": "Hajimi轮询的部署教程，部署完后可以多key轮询、免梯直连gemini key。和Gemini Balance功能差不多，二者部署其一即可。个人推荐Hajimi轮询。",
+            "remark": "Hajimi轮询的部署教程，部署完后可以多key轮询、免梯直连gemini key。和Gemini Balance功能差不多，二者部署其一即可。\n个人推荐Hajimi轮询。",
             "category": "图文教程",
             "colorTheme": "green",
             "icon": "Rocket"
           },
           {
             "id": "t105",
-            "title": "Gemini-Balance 轮询搭建教程",
-            "linkUrl": "",
-            "remark": "Gemini Balance轮询的部署教程，部署完后可以多key轮询、免梯直连gemini key。和Gemini Balance功能差不多，二者部署其一即可。个人推荐Hajimi轮询。",
+            "title": "Gemini-Balance 轮询搭建教程-Claw版",
+            "linkUrl": "https://rrpkxlo5h4.feishu.cn/wiki/HvH4wKwv2iyCvek7vG0cOeEOnQc?from=from_copylink",
+            "remark": "Gemini Balance轮询的部署教程，部署完后可以多key轮询、免梯直连gemini key。和Gemini Balance功能差不多，二者部署其一即可。HuggingFace总是封Space，所以本教程针对claw平台。（需要Github账号注册满180天）\n\n轮询的话，个人更推荐Hajimi轮询。",
             "category": "图文教程",
             "colorTheme": "indigo",
             "icon": "Rocket"
@@ -377,7 +377,7 @@ export const tabs = [
             "id": "t202",
             "title": "API Key在线测试工具",
             "linkUrl": "https://ceshi.laopobao.online/",
-            "remark": "可以非常方便的在网页中测试你的Gemini Key有效性，提供了双端测试，可以测试是否是因为你的网络问题导致Gemini Key无法连接。自定义API测试中，虽然写了轮询测试，但是实际上支持所有Openai接口的调用和测试。",
+            "remark": "可以非常方便的在网页中测试你的Gemini Key有效性，提供了双端测试，可以测试是否是因为你的网络问题导致Gemini Key无法连接。\n\n自定义API测试中，虽然写了轮询测试，但是实际上支持所有Openai接口的调用和测试。",
             "category": "在线工具",
             "colorTheme": "indigo",
             "icon": "Zap"
