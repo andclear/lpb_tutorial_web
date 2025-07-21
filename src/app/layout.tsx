@@ -4,8 +4,11 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: '老婆宝的教程导航站',
+  title: '老婆宝的教程发布站',
   description: '一个纯静态、由配置文件驱动的个人教程聚合与导航网站',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
